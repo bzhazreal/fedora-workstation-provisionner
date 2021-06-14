@@ -21,9 +21,9 @@
       - thunderbird
       - vim
       - tig
+      - git
       - htop
       - make
-      - git
   tags:
     - base
     - package
@@ -100,8 +100,6 @@
       v: "true"
     - k: "/org/gnome/desktop/sound/event-sounds"
       v: "false"
-    - k: "/org/gnome/shell/enabled-extensions"
-      v: "['horizontal-workspaces@gnome-shell-extensions.gcampax.github.com']"
     - k: "/org/gnome/shell/app-switcher/current-workspace-only"
       v: "true"
     - k: "/org/gnome/desktop/interface/gtk-theme"
@@ -196,14 +194,6 @@
     - container
     - package
 
-- name: Create docker group
-  group:
-    name: 'docker'
-    state: present
-  tags:
-    - container
-    - permission
-
 - name: Add user in docker group
   user:
     name: "{{ username }}"
@@ -213,12 +203,6 @@
     - container
     - permission
 
-- name: Disable CGroups V2
-  command: grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
-  when: true
-  tags:
-    - container
-
 - name: Add docker0 interface
   firewalld:
     interface: docker0
@@ -227,17 +211,6 @@
     state: enabled
   tags:
     - container
-    - firewall
-
-- name: Masquerade Fedora Workstation
-  firewalld:
-    zone: FedoraWorkstation
-    permanent: yes
-    masquerade: "true"
-    state: enabled
-  tags:
-    - container
-    - firewall
 
 - name: Install docker-compose
   pip:
@@ -245,65 +218,6 @@
   tags:
     - container
     - package
-
-###
-#
-# Vagrant
-#
-###
-- name: Install virtualization tools
-  dnf:
-    name: ['qemu-kvm', 'libvirt', 'libguestfs-tools', 'virt-install', 'rsync']
-  tags:
-    - virt
-    - package
-
-- name: Install vagrant and vagrant libvirt
-  dnf:
-    name: ['vagrant', 'vagrant-libvirt']
-  tags:
-    - virt
-    - package
-
-- name: Enable vagrant zsh plugin
-  lineinfile:
-    path: "/home/{{ username }}/.zshrc"
-    line: "plugins+=('vagrant')"
-  tags:
-    - virt
-
-- name: Add hashicorp repo
-  yum_repository:
-    name: hashicorp_repo
-    description: The Hashicorp repo
-    baseurl: https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
-    enabled: yes
-    gpgcheck: yes
-    gpgkey: https://rpm.releases.hashicorp.com/gpg
-  tags:
-    - virt
-    - repo
-
-- name: Install packer
-  dnf:
-    name: packer
-    update_cache: yes
-  tags:
-    - virt
-    - package
-
-- name: Packer file exist
-  stat:
-    path: /usr/bin/packer
-  register: packer_bin
-  tags:
-    - virt
-
-- name: Rename packer package
-  command: mv /usr/bin/packer /usr/bin/packer.io
-  when: packer_bin.stat.exists
-  tags:
-    - virt
 
 ###
 #
@@ -393,7 +307,7 @@
     - "ms-azuretools.vscode-docker"
     - "ms-python.python"
     - "ms-toolsai.jupyter"
-    - "vscoss.vscode-ansible"
+    - "zbr.vscode-ansible"
   tags:
     - codium
     - codium-extension

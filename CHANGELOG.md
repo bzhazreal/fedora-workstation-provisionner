@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 34.0
+- Delete  : Remove Vagrant support.
+- Update  : Fedora testing container 33 => 34.
+- Delete  : Remove horizontal-workspaces gnome-shell because of gnome 40.
+- Feature : Replace vscoss.vscode-ansible by zbr.vscode-ansible (redhat).
+
 ## Version 33.0
 - Rework  : Merge all roles in workstation role.
 - Rework  : Manage tasks by tags.
